@@ -5,6 +5,9 @@
         },
         {
             "path": "LearnLogging"
+        },
+        {
+            "path": "MyFirstEfCoreApp"
         }
     ],
     "settings": {
