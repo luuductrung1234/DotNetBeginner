@@ -29,9 +29,13 @@ namespace DelegateAndEvent
 
         #region Events
 
+        /// <summary>
+        /// This event is a delegate that never has more 
+        /// than one method assigned to. Do not need "event" keyword
+        /// </summary>
         public EventHandler Shout;
-        public EventHandler<int> NeedBankSupport;
-        public EventHandler<int> NeedBankSubscription;
+        public event EventHandler<int> NeedBankSupport;
+        public event EventHandler<int> NeedBankSubscription;
 
         #endregion Events
 
