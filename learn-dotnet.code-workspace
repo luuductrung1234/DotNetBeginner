@@ -8,6 +8,9 @@
         },
         {
             "path": "MyFirstEfCoreApp"
+        },
+        {
+            "path": "DelegateAndEvent"
         }
     ],
     "settings": {
