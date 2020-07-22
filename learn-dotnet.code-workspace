@@ -1,13 +1,19 @@
 {
     "folders": [
         {
+            "path": "LearnAssemblies"
+        },
+        {
             "path": "Dumping"
         },
         {
             "path": "LearnLogging"
         },
         {
-            "path": "LearnAssemblies"
+            "path": "MyFirstEfCoreApp"
+        },
+        {
+            "path": "DelegateAndEvent"
         }
     ],
     "settings": {
