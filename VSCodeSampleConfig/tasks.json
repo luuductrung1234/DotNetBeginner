@@ -1,0 +1,356 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "create unit test project",
+            "type": "shell",
+            "osx": {
+                "command": "sh",
+                "args": [
+                    "./.vscode/scripts/generate-unittest.sh",
+                    "${input:newProject}",
+                    "${input:targetSolution}"
+                ]
+            },
+            "windows": {
+                "command": ".\\.vscode\\scripts\\generate-unittest.ps1",
+                "args": ["${input:newProject}", "${input:targetSolution}"]
+            },
+            "group": "none",
+            "problemMatcher": [],
+            "presentation": {
+                "showReuseMessage": false
+            }
+        },
+        {
+            "label": "install Azure-Artifact-Credential-Provider",
+            "type": "shell",
+            "osx": {
+                "command": "sh",
+                "args": ["./.vscode/scripts/installcredprovider.sh"]
+            },
+            "windows": {
+                "command": "",
+                "options": {
+                    "shell": {
+                        "executable": "${config:current.powershell-executable}",
+                        "args": [
+                            "-executionpolicy",
+                            "bypass",
+                            "-file",
+                            ".\\.vscode\\scripts\\installcredprovider.ps1"
+                        ]
+                    }
+                }
+            },
+            "detail": "Run this task to install Credential Provider tool to help package restore authenticate a private feed",
+            "problemMatcher": []
+        },
+        {
+            "label": "package restore (wait for authentication)",
+            "command": "dotnet",
+            "type": "process",
+            "group": "build",
+            "args": [
+                "restore",
+                "${workspaceFolder}/${input:target}",
+                "--interactive",
+                "--configfile",
+                "${workspaceFolder}/nuget.config"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "package restore",
+            "command": "dotnet",
+            "type": "process",
+            "group": "build",
+            "args": [
+                "restore",
+                "${workspaceFolder}/${input:target}",
+                "--configfile",
+                "${workspaceFolder}/nuget.config"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "group": "build",
+            "args": [
+                "build",
+                "${workspaceFolder}/${input:target}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build solution",
+            "command": "dotnet",
+            "type": "process",
+            "group": "build",
+            "args": [
+                "build",
+                "${workspaceFolder}/${input:targetSolution}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "runOptions": {
+                "reevaluateOnRerun": true,
+                "runOn": "folderOpen"
+            }
+        },
+        {
+            "label": "analysis code on solution",
+            "type": "shell",
+            "osx": {
+                "command": "sh",
+                "args": [
+                    "./.vscode/scripts/sonarqube-analysis.sh",
+                    "${input:targetSolution}",
+                    "${config:sonarlint.config.projectKey}",
+                    "${config:sonarlint.config.serverUrl}",
+                    "${config:sonarlint.config.token}"
+                ]
+            },
+            "windows": {
+                "command": ".\\.vscode\\scripts\\sonarqube-analysis.ps1",
+                "args": [
+                    "${input:targetSolution}",
+                    "${config:sonarlint.config.projectKey}",
+                    "${config:sonarlint.config.serverUrl}",
+                    "${config:sonarlint.config.token}"
+                ]
+            },
+            "group": "none",
+            "problemMatcher": [],
+            "presentation": {
+                "showReuseMessage": false
+            }
+        },
+        {
+            "label": "watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "${input:target}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "preLaunch",
+            "dependsOn": ["package restore", "build solution"]
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "group": "test",
+            "args": ["test", "${workspaceFolder}/${input:targetTestProject}"],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean",
+            "osx": {
+                "command": "sh",
+                "args": ["./.vscode/scripts/clean.sh", "${input:target}"]
+            },
+            "windows": {
+                "command": ".\\.vscode\\scripts\\clean.ps1",
+                "args": ["${input:target}"]
+            },
+            "type": "shell",
+            "group": "build",
+            "problemMatcher": [],
+            "presentation": {
+                "showReuseMessage": false
+            }
+        },
+        {
+            "label": "publish",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/${input:target}",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "pack",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "pack",
+                "${workspaceFolder}/${input:target}",
+                "-o",
+                "./packages"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "nuget push",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "nuget",
+                "push",
+                "-s",
+                "${input:nugetServer}",
+                "-k",
+                "${input:nugetServerApiKey}",
+                "${workspaceFolder}/packages/${input:targetProject}.${input:version}.nupkg"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "remove project from solution",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "sln",
+                "${input:targetSolution}",
+                "remove",
+                "${input:targetProject}"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "add project from solution",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "sln",
+                "${input:targetSolution}",
+                "add",
+                "${input:targetProject}"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "add package",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "add",
+                "${workspaceFolder}/${input:targetProject}",
+                "package",
+                "${input:packageToAdd}",
+                "-s",
+                "${input:nugetServer}"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "add reference",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "add",
+                "${workspaceFolder}/${input:targetProject}",
+                "reference",
+                "./${input:referenceToAdd}"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "target",
+            "description": "Solution/Project:",
+            "options": [
+                "[YourSolutionName].sln",
+                "[directory]/[YourSolutionName].sln",
+                "[YourProject]/[YourProject].csproj",
+                "[directory]/[YourProject]/[YourProject].csproj",
+                "[YourProject]",
+                "[directory]/[YourProject]"
+            ],
+            "default": "[YourSolutionName].sln",
+            "type": "pickString"
+        },
+        {
+            "id": "targetSolution",
+            "description": "Solution:",
+            "options": [
+                "[YourSolutionName].sln",
+                "[directory]/[YourSolutionName].sln"
+            ],
+            "default": "[YourSolutionName].sln",
+            "type": "pickString"
+        },
+        {
+            "id": "targetProject",
+            "description": "Project:",
+            "options": [
+                "[YourProject]/[YourProject].csproj",
+                "[directory]/[YourProject]/[YourProject].csproj",
+                "[YourProject]",
+                "[directory]/[YourProject]"
+            ],
+            "default": "[YourProject]/[YourProject].csproj",
+            "type": "pickString"
+        },
+        {
+            "id": "newProject",
+            "description": "Project Name:",
+            "default": "",
+            "type": "promptString"
+        },
+        {
+            "id": "targetTestProject",
+            "description": "Project:",
+            "options": [],
+            "default": "",
+            "type": "pickString"
+        },
+        {
+            "id": "nugetServer",
+            "description": "Nuget Server Feed:",
+            "options": ["https://api.nuget.org/v3/index.json"],
+            "default": "https://api.nuget.org/v3/index.json",
+            "type": "pickString"
+        },
+        {
+            "id": "nugetServerApiKey",
+            "description": "Nuget Server Api Key:",
+            "default": "NUGET-SERVER-API-KEY",
+            "type": "promptString"
+        },
+        {
+            "id": "version",
+            "description": "Version:",
+            "default": "1.0.0",
+            "type": "promptString"
+        },
+        {
+            "id": "packageToAdd",
+            "description": "Package Name:",
+            "default": "Newtonsoft.Json",
+            "type": "promptString"
+        },
+        {
+            "id": "referenceToAdd",
+            "description": "Path to reference (.csproj file):",
+            "default": "ClassLibProject",
+            "type": "promptString"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "files.exclude": {
+        "**/.vs": true,
+        "**/.idea": true,
+        "**/bin": true,
+        "**/obj": true
+    },
+    "dotnet-test-explorer.testProjectPath": "**/*.sln",
+    "current.powershell-executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+}
