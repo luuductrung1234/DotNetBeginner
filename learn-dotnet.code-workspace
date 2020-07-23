@@ -23,6 +23,9 @@
         },
         {
             "path": "VSCodeSampleConfig"
+        },
+        {
+            "path": "AssembliesAndNamespaces"
         }
     ],
     "settings": {
