@@ -14,6 +14,18 @@
         },
         {
             "path": "DelegateAndEvent"
+        },
+        {
+            "path": "SharedLibrary"
+        },
+        {
+            "path": "DotNetCoreEverywhere"
+        },
+        {
+            "path": "VSCodeSampleConfig"
+        },
+        {
+            "path": "AssembliesAndNamespaces"
         }
     ],
     "settings": {
@@ -24,7 +36,7 @@
             "**/CVS": true,
             "**/.DS_Store": true,
             "**/.vs": true,
-            "**/bin": true,
+            "**/bin": false,
             "**/obj": true
         }
     }

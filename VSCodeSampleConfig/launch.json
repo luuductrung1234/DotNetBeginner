@@ -1,0 +1,53 @@
+{
+    // Use IntelliSense to find out which attributes exist for C# debugging
+    // Use hover for the description of the existing attributes
+    // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (web)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "preLaunch",
+            "program": "${workspaceFolder}/${input:target}/bin/Debug/${input:framework}/${input:target}.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/${input:target}",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "${input:environment}"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/${input:target}/Views"
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "target",
+            "description": "[LAUNCH] Select startup project:",
+            "options": ["[YourProject]"],
+            "default": "[YourProject]",
+            "type": "pickString"
+        },
+        {
+            "id": "framework",
+            "description": "[LAUNCH] Select framework:",
+            "options": ["netcoreapp2.1", "netcoreapp3.1"],
+            "default": "netcoreapp3.1",
+            "type": "pickString"
+        },
+        {
+            "id": "environment",
+            "description": "[LAUNCH] Select environment:",
+            "options": ["Local", "Development", "Pipeline"],
+            "default": "Development",
+            "type": "pickString"
+        }
+    ]
+}
