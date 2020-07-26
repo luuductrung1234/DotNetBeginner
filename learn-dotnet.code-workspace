@@ -26,6 +26,9 @@
         },
         {
             "path": "ProtectingData"
+        },
+        {
+            "path": "AssembliesAndNamespaces"
         }
     ],
     "settings": {
