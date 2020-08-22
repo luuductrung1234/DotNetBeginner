@@ -1,12 +1,14 @@
 using System;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
+using Domain;
 
 namespace CryptographyLib
 {
     public static class AuthProtector
     {
-        public static User Register(string username, string password)
+        public static User Register(string username, string password, string[] roles = null)
         {
             // generate a random salt (the same password but salted and hashed results are not the same)
             var rng = RandomNumberGenerator.Create();
@@ -21,7 +23,8 @@ namespace CryptographyLib
             {
                 Name = username,
                 Salt = saltText,
-                SaltedHashedPassword = saltedHashedPassword
+                SaltedHashedPassword = saltedHashedPassword,
+                Roles = roles
             };
 
             ApplicationContext.Users.Add(user.Name, user);
@@ -40,6 +43,16 @@ namespace CryptographyLib
             var saltedHashedPassword = SaltAndHashPassword(password, user.Salt);
 
             return (saltedHashedPassword == user.SaltedHashedPassword);
+        }
+
+        public static void LogIn(string username, string password)
+        {
+            if (CheckPassword(username, password))
+            {
+                var identity = new GenericIdentity(username, "SampleAuth");
+                var principal = new GenericPrincipal(identity, ApplicationContext.Users[username].Roles);
+                System.Threading.Thread.CurrentPrincipal = principal;
+            }
         }
 
         private static string SaltAndHashPassword(string password, string salt)
