@@ -1,4 +1,8 @@
-﻿using System;
+﻿using System.Security;
+using System.Security.Claims;
+using System.Threading;
+using CryptographyLib;
+using static System.Console;
 
 namespace SecureApp
 {
@@ -6,20 +10,66 @@ namespace SecureApp
     {
         static void Main(string[] args)
         {
-            Protector.Register("Alice", "Pa$$w0rd", new[] { "Admins" });
-            Protector.Register("Bob", "Pa$$w0rd", new[] { "Sales", "TeamLeads" });
-            Protector.Register("Eve", "Pa$$w0rd");
+            AuthProtector.Register("Alice", "Pa$$w0rd", new[] { "Admins" });
+            AuthProtector.Register("Bob", "Pa$$w0rd", new[] { "Sales", "TeamLeads" });
+            AuthProtector.Register("Eve", "Pa$$w0rd");
+
+            if (!DoLogin())
+                return;
+
+            ShowCurrentPrincipal();
+
+            try
+            {
+                RunSecuredAdminFeature();
+            }
+            catch (System.Exception ex)
+            {
+                WriteLine($"{ex.GetType()}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Simulated Authentication
+        /// </summary>
+        /// <returns></returns>
+        static bool DoLogin()
+        {
             Write($"Enter your user name: ");
             string username = ReadLine();
             Write($"Enter your password: ");
+            string password = ReadLine();
 
-            Protector.LogIn(username, password);
+            AuthProtector.LogIn(username, password);
             if (Thread.CurrentPrincipal == null)
             {
                 WriteLine("Log in failed.");
-                return;
+                return true;
             }
 
+            return false;
+        }
+
+        /// <summary>
+        /// Simulated Authorization
+        /// </summary>
+        static void RunSecuredAdminFeature()
+        {
+            if (Thread.CurrentPrincipal == null)
+            {
+                throw new SecurityException("A user must be logged in to access this feature.");
+            }
+
+            if (!Thread.CurrentPrincipal.IsInRole("Admins"))
+            {
+                throw new SecurityException("A user must be a member of Admins to access this feature.");
+            }
+
+            WriteLine("You have access to this secure feature.");
+        }
+
+        static void ShowCurrentPrincipal()
+        {
             var p = Thread.CurrentPrincipal;
             WriteLine($"IsAuthenticated: {p.Identity.IsAuthenticated}");
             WriteLine($"AuthenticationType: {p.Identity.AuthenticationType}");
@@ -28,9 +78,8 @@ namespace SecureApp
             WriteLine($"IsInRole(\"Sales\"): {p.IsInRole("Sales")}");
             if (p is ClaimsPrincipal)
             {
-                WriteLine(
-                $"{p.Identity.Name} has the following claims:");
-                foreach (Claim in (p as ClaimsPrincipal).Claims)
+                WriteLine($"{p.Identity.Name} has the following claims:");
+                foreach (var claim in (p as ClaimsPrincipal).Claims)
                 {
                     WriteLine($"{claim.Type}: {claim.Value}");
                 }
