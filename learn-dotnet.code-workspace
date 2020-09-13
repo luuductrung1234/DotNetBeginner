@@ -29,6 +29,12 @@
         },
         {
             "path": "AssembliesAndNamespaces"
+        },
+        {
+            "path": "LinqSample"
+        },
+        {
+            "path": "ExpressionTrees"
         }
     ],
     "settings": {
