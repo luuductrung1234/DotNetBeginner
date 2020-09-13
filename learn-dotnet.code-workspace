@@ -25,6 +25,9 @@
             "path": "VSCodeSampleConfig"
         },
         {
+            "path": "ProtectingData"
+        },
+        {
             "path": "AssembliesAndNamespaces"
         }
     ],
