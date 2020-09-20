@@ -35,6 +35,9 @@
         },
         {
             "path": "MonitoringPerformance"
+        },
+        {
+            "path": "PracticalApps"
         }
     ],
     "settings": {
